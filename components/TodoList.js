@@ -1,40 +1,34 @@
 // components/TodoList.js
-import { useState } from 'react';
 import TaskItem from './TaskItem';
 
-const TodoList = ({ todos, onDelete, onEdit, onMoveUp, onMoveDown }) => {
-  const [completedTodos, setCompletedTodos] = useState([]);
-
-  const handleToggleComplete = (id) => {
-    if (completedTodos.includes(id)) {
-      setCompletedTodos(completedTodos.filter(todoId => todoId !== id));
-    } else {
-      setCompletedTodos([...completedTodos, id]);
-    }
-  };
-
+const TodoList = ({ todos, onDelete, onEdit, onToggleComplete, onMoveUp, onMoveDown }) => {
   const sortedTodos = [...todos].sort((a, b) => {
-    if (completedTodos.includes(a.id) && !completedTodos.includes(b.id)) {
-      return 1;
-    } else if (!completedTodos.includes(a.id) && completedTodos.includes(b.id)) {
-      return -1;
-    } else {
-      return 0;
-    }
+    if (a.completed === b.completed) return 0;
+    return a.completed ? 1 : -1;
   });
 
+  if (todos.length === 0) {
+    return (
+      <div className="mt-6 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-slate-500">
+        No tasks yet. Add a task to get started and keep your day organized.
+      </div>
+    );
+  }
+
   return (
-    <div className="divide-y divide-gray-200">
-      {sortedTodos.map((todo) => (
+    <div className="mt-6 space-y-3">
+      {sortedTodos.map((todo, index) => (
         <TaskItem
           key={todo.id}
           task={todo}
-          completed={completedTodos.includes(todo.id)}
+          completed={todo.completed}
           onEdit={onEdit}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
           onDelete={onDelete}
-          onToggleComplete={handleToggleComplete}
+          onToggleComplete={onToggleComplete}
+          isFirst={index === 0}
+          isLast={index === sortedTodos.length - 1}
         />
       ))}
     </div>
